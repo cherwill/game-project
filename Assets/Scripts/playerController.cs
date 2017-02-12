@@ -9,7 +9,7 @@ public class playerController : MonoBehaviour {
 	void Start () {
 		
 	}
-	
+	//test comment
 	// Update is called once per frame
 	void Update () {
         //player movement
