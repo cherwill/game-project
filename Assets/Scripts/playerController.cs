@@ -7,6 +7,7 @@ public class playerController : MonoBehaviour {
     public float speed;
     Rigidbody2D rb;
     [SerializeField] float jumpHeight;
+    bool onGround;
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody2D>();
