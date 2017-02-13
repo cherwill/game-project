@@ -22,6 +22,7 @@ public class playerController : MonoBehaviour {
         if(Input.GetButtonDown("Jump"))
         {
             rb.AddForce(jumpHeight * Vector2.up);
+
         }
             
     }
