@@ -3,31 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class playerController : MonoBehaviour {
+
+    //speed stuff
+    float speed;
     [SerializeField]
-    public float speed;
+    float defaultSpeed;
+    [SerializeField]
+    float acceleration;
+    [SerializeField]
+    float maxSpeed;
+    [SerializeField]
+    float speedDecay;
+
+    //Components
     Rigidbody2D rb;
-    bool onGround = false;
     BoxCollider2D bc2d;
+    CapsuleCollider2D cc;
+
+    //Jumping variablse
+    bool onGround = false;
     public float shortJump = 3f;   // Velocity for the lowest jump
     public float fullJump = 10f;          // Velocity for the highest jump
     bool jump = false;
     bool jumpCancel = false;
-    CapsuleCollider2D cc;
+    
 
 
     // Use this for initialization
     void Start () {
+        speed = 0f;
+        maxSpeed = 10f;
+        acceleration = 10f;
+        speedDecay = 0.3f;
         rb = GetComponent<Rigidbody2D>();
         bc2d = GetComponent<BoxCollider2D>();
         cc = GetComponent<CapsuleCollider2D>();
 	}
-    //test comment
+
     // Update is called once per frame
     void Update() {
-        //player movement
-        transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, 0, 0);
-
-        //onGround = Physics.CheckCapsule(cc.bounds.center, new Vector3(cc.bounds.center.x, cc.bounds.min.y - 0.1f, cc.bounds.center.z), 0.18f);
+        calculateSpeed();
 
         if (Input.GetButtonDown("Jump") && onGround)   // Player starts pressing the button
             jump = true;
@@ -37,6 +52,10 @@ public class playerController : MonoBehaviour {
 
     void FixedUpdate()
     {
+        //Move
+        transform.Translate(speed * Time.deltaTime, 0 , 0);
+
+
         // Normal jump
         if (jump)
         {
@@ -52,18 +71,67 @@ public class playerController : MonoBehaviour {
         }
     }
 
+    void calculateSpeed()
+    {
+        if (Input.GetAxis("Horizontal") != 0)
+        {
+            float inputAccel = Input.GetAxis("Horizontal"); //however much input the player is giving
+            speed += inputAccel * acceleration;
+        } else
+        {
+            //deceleration, more on ground
+            if (speed > 0)
+            {
+                if (onGround)
+                {
+                    speed -= speedDecay;
+                } else
+                {
+                    speed -= (speedDecay * 0.25f);
+                }
+                
+            }
+            else if (speed < 0)
+            {
+                if (onGround)
+                {
+                    speed += speedDecay;
+                }
+                else
+                {
+                    speed += (speedDecay * 0.25f);
+                }
+            }
+            
+        }
+        //player movement
+        //transform.Translate(Input.GetAxis("Horizontal") * speed * Time.deltaTime, 0, 0);
+        if (speed < 0 && Mathf.Abs(speed) > maxSpeed)
+        {
+            speed = -maxSpeed;
+        }
+        else if (speed > 0 && speed > maxSpeed)
+        {
+            speed = maxSpeed;
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Terrain")
         {
+            //if youre on terrain, you're grounded and can jump again
             onGround = true;
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
+
+        
         if (other.tag == "Terrain")
         {
+            //when you leave terrain, you're in the air and cannot jump again
             onGround = false;
         }
     }
