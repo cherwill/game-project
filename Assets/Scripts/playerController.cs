@@ -5,6 +5,7 @@ using UnityEngine;
 public class playerController : MonoBehaviour {
 
     //speed stuff
+    [SerializeField]
     float speed;
     [SerializeField]
     float defaultSpeed;
@@ -34,7 +35,7 @@ public class playerController : MonoBehaviour {
         speed = 0f;
         maxSpeed = 10f;
         acceleration = 10f;
-        speedDecay = 0.3f;
+        speedDecay = 0.5f;
         rb = GetComponent<Rigidbody2D>();
         bc2d = GetComponent<BoxCollider2D>();
         cc = GetComponent<CapsuleCollider2D>();
@@ -76,7 +77,7 @@ public class playerController : MonoBehaviour {
         if (Input.GetAxis("Horizontal") != 0)
         {
             float inputAccel = Input.GetAxis("Horizontal"); //however much input the player is giving
-            speed += inputAccel * acceleration;
+            speed += inputAccel * (acceleration + defaultSpeed);
         } else
         {
             //deceleration, more on ground
@@ -84,10 +85,10 @@ public class playerController : MonoBehaviour {
             {
                 if (onGround)
                 {
-                    speed -= speedDecay;
+                    speed -= speedDecay * speed;
                 } else
                 {
-                    speed -= (speedDecay * 0.25f);
+                    speed -= (speedDecay * 0.25f) * speed;
                 }
                 
             }
@@ -95,11 +96,11 @@ public class playerController : MonoBehaviour {
             {
                 if (onGround)
                 {
-                    speed += speedDecay;
+                    speed -= speedDecay * speed;
                 }
                 else
                 {
-                    speed += (speedDecay * 0.25f);
+                    speed -= (speedDecay * 0.25f) * speed;
                 }
             }
             
